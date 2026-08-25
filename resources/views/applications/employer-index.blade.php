@@ -41,10 +41,11 @@
         </h1>
 
         <p style="color:#6b7280;">
-            İlanlarınıza gelen aday başvurularını buradan inceleyebilirsiniz.
+            İlanlarınıza gelen aday başvurularını yönetin.
         </p>
 
     </div>
+
 
     @if ($applications->isEmpty())
 
@@ -55,10 +56,6 @@
             <p style="color:#6b7280;">
                 İlanlarınıza başvuru geldiğinde burada görünecek.
             </p>
-
-            <a href="/employer/jobs/create" class="btn">
-                + Yeni İlan Oluştur
-            </a>
 
         </div>
 
@@ -107,7 +104,7 @@
                                 margin:5px 0;
                                 color:#6b7280;
                             ">
-                                📍 {{ $application->job->location ?? 'Lokasyon belirtilmedi' }}
+                                📧 {{ $application->user->email }}
                             </p>
 
                         </div>
@@ -117,6 +114,7 @@
                         </span>
 
                     </div>
+
 
                     <div class="grid grid-2" style="margin-top:20px;">
 
@@ -137,13 +135,14 @@
                         <div>
 
                             <p style="color:#6b7280;">
-                                <strong>Email:</strong>
-                                {{ $application->user->email }}
+                                <strong>İlan:</strong>
+                                {{ $application->job->title }}
                             </p>
 
                         </div>
 
                     </div>
+
 
                     <div style="
                         display:flex;
@@ -157,6 +156,13 @@
                             class="btn"
                         >
                             🔍 Başvuruyu İncele
+                        </a>
+
+                        <a
+                            href="/applications/{{ $application->id }}/message"
+                            class="btn btn-secondary"
+                        >
+                            💬 Adaya Mesaj Gönder
                         </a>
 
                     </div>

@@ -16,6 +16,8 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\InterviewController;
 
 // ==================================================
 // ANA SAYFA
@@ -31,6 +33,7 @@ Route::get('/', function () {
 // ==================================================
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm']);
+
 Route::post('/register', [RegisterController::class, 'register']);
 
 
@@ -52,38 +55,16 @@ Route::get('/candidate/dashboard', function () {
     return view('candidate-dashboard');
 })->middleware(['auth', 'role:candidate']);
 
+
 Route::get('/employer/dashboard', function () {
     return view('employer-dashboard');
 })->middleware(['auth', 'role:employer']);
 
+
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
     ->middleware(['auth', 'role:admin']);
-Route::get('/admin/users', [AdminController::class, 'users'])
-    ->middleware(['auth', 'role:admin']);
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
-    ->middleware(['auth', 'role:admin']);
 
-Route::get('/admin/users', [AdminController::class, 'users'])
-    ->middleware(['auth', 'role:admin']);
 
-Route::get('/admin/companies', [AdminController::class, 'companies'])
-    ->middleware(['auth', 'role:admin']);
-
-Route::get('/admin/jobs', [AdminController::class, 'jobs'])
-    ->middleware(['auth', 'role:admin']);
-
-Route::get('/admin/applications', [AdminController::class, 'applications'])
-    ->middleware(['auth', 'role:admin']);Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])
-    ->middleware(['auth', 'role:admin']);
-
-Route::put('/admin/jobs/{job}/status', [AdminController::class, 'toggleJobStatus'])
-    ->middleware(['auth', 'role:admin']);
-
-Route::delete('/admin/jobs/{job}', [AdminController::class, 'deleteJob'])
-    ->middleware(['auth', 'role:admin']);
-
-Route::get('/admin/applications/{application}', [AdminController::class, 'showApplication'])
-    ->middleware(['auth', 'role:admin']);
 // ==================================================
 // CANDIDATE PROFILE
 // ==================================================
@@ -296,6 +277,71 @@ Route::get('/employer/applications/{application}', [ApplicationController::class
 
 Route::put('/employer/applications/{application}/status', [ApplicationController::class, 'updateStatus'])
     ->middleware(['auth', 'role:employer']);
+
+
+// ==================================================
+// MESSAGES
+// ==================================================
+
+// Mesajlar listesi
+Route::get('/messages', [MessageController::class, 'index'])
+    ->middleware('auth');
+
+// Başvuru üzerinden konuşma başlat
+Route::get('/applications/{application}/message', [MessageController::class, 'createFromApplication'])
+    ->middleware('auth');
+
+// Konuşmayı görüntüle
+Route::get('/messages/{conversation}', [MessageController::class, 'show'])
+    ->middleware('auth');
+
+// Mesaj gönder
+Route::post('/messages/{conversation}', [MessageController::class, 'store'])
+    ->middleware('auth');
+Route::get('/employer/applications/{application}/interview/create', [InterviewController::class, 'create'])
+    ->middleware(['auth', 'role:employer']);
+
+Route::post('/employer/applications/{application}/interview', [InterviewController::class, 'store'])
+    ->middleware(['auth', 'role:employer']);
+
+Route::get('/candidate/interviews', [InterviewController::class, 'candidateIndex'])
+    ->middleware(['auth', 'role:candidate']);
+
+Route::put('/candidate/interviews/{interview}/respond', [InterviewController::class, 'respond'])
+    ->middleware(['auth', 'role:candidate']);
+
+// ==================================================
+// ADMIN
+// ==================================================
+
+Route::get('/admin/users', [AdminController::class, 'users'])
+    ->middleware(['auth', 'role:admin']);
+
+Route::get('/admin/companies', [AdminController::class, 'companies'])
+    ->middleware(['auth', 'role:admin']);
+
+Route::get('/admin/jobs', [AdminController::class, 'jobs'])
+    ->middleware(['auth', 'role:admin']);
+
+Route::get('/admin/applications', [AdminController::class, 'applications'])
+    ->middleware(['auth', 'role:admin']);
+
+
+// Admin kullanıcı silme
+Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])
+    ->middleware(['auth', 'role:admin']);
+
+// Admin ilan durumu
+Route::put('/admin/jobs/{job}/status', [AdminController::class, 'toggleJobStatus'])
+    ->middleware(['auth', 'role:admin']);
+
+// Admin ilan silme
+Route::delete('/admin/jobs/{job}', [AdminController::class, 'deleteJob'])
+    ->middleware(['auth', 'role:admin']);
+
+// Admin başvuru detay
+Route::get('/admin/applications/{application}', [AdminController::class, 'showApplication'])
+    ->middleware(['auth', 'role:admin']);
 
 
 // ==================================================

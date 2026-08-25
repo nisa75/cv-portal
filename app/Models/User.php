@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use App\Models\Conversation;
+use App\Models\Message;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -70,5 +71,19 @@ class User extends Authenticatable
     public function favorites()
 {
     return $this->hasMany(Favorite::class);
+}
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
+public function candidateConversations()
+{
+    return $this->hasMany(Conversation::class, 'candidate_id');
+}
+
+public function employerConversations()
+{
+    return $this->hasMany(Conversation::class, 'employer_id');
 }
 }

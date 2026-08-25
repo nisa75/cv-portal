@@ -32,7 +32,10 @@
 
     $statusClass = $statusClasses[$application->status]
         ?? 'badge-blue';
+
+    $interview = $application->interview;
 @endphp
+
 
 <div>
 
@@ -47,6 +50,28 @@
         </h1>
 
     </div>
+
+
+    @if (session('success'))
+
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+    @if ($errors->any())
+
+        <div class="alert alert-error">
+
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+
+        </div>
+
+    @endif
 
 
     <!-- ADAY -->
@@ -117,6 +142,113 @@
             <strong>CV:</strong>
             {{ $application->cv->title }}
         </p>
+
+    </div>
+
+
+    <!-- MESAJLAŞMA + MÜLAKAT -->
+
+    <div class="grid grid-2" style="margin-top:20px;">
+
+        <div class="card">
+
+            <h2>
+                💬 İletişim
+            </h2>
+
+            <p style="color:#6b7280;">
+                Adayla doğrudan iletişim kurabilirsiniz.
+            </p>
+
+            <a
+                href="/applications/{{ $application->id }}/message"
+                class="btn"
+                style="width:100%;"
+            >
+                💬 Adaya Mesaj Gönder
+            </a>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>
+                🗓️ Mülakat
+            </h2>
+
+            @if ($interview)
+
+                @php
+                    $interviewStatusLabels = [
+                        'pending' => 'Bekliyor',
+                        'accepted' => 'Kabul Edildi',
+                        'rejected' => 'Reddedildi',
+                        'completed' => 'Tamamlandı',
+                        'cancelled' => 'İptal Edildi',
+                    ];
+
+                    $interviewStatusClasses = [
+                        'pending' => 'badge-yellow',
+                        'accepted' => 'badge-green',
+                        'rejected' => 'badge-red',
+                        'completed' => 'badge-blue',
+                        'cancelled' => 'badge-red',
+                    ];
+                @endphp
+
+                <p>
+                    <strong>Tarih:</strong>
+                    {{ $interview->scheduled_at->format('d.m.Y H:i') }}
+                </p>
+
+                <p>
+                    <strong>Süre:</strong>
+                    {{ $interview->duration }} dakika
+                </p>
+
+                <p>
+                    <strong>Tür:</strong>
+
+                    {{ match($interview->type) {
+                        'online' => 'Online',
+                        'office' => 'Ofiste',
+                        'phone' => 'Telefon',
+                        default => $interview->type,
+                    } }}
+                </p>
+
+                <p>
+                    <span class="badge {{ $interviewStatusClasses[$interview->status] ?? 'badge-blue' }}">
+                        {{ $interviewStatusLabels[$interview->status] ?? $interview->status }}
+                    </span>
+                </p>
+
+                <a
+                    href="/employer/applications/{{ $application->id }}/interview/create"
+                    class="btn btn-secondary"
+                    style="width:100%;"
+                >
+                    ✏️ Mülakatı Güncelle
+                </a>
+
+            @else
+
+                <p style="color:#6b7280;">
+                    Bu başvuru için henüz bir mülakat planlanmadı.
+                </p>
+
+                <a
+                    href="/employer/applications/{{ $application->id }}/interview/create"
+                    class="btn"
+                    style="width:100%;"
+                >
+                    🗓️ Mülakat Planla
+                </a>
+
+            @endif
+
+        </div>
 
     </div>
 
@@ -279,15 +411,22 @@
                     </strong>
 
                     @if ($education->degree)
+
                         <p style="margin:5px 0;">
                             {{ $education->degree }}
                         </p>
+
                     @endif
 
                     @if ($education->field)
-                        <p style="margin:5px 0; color:#6b7280;">
+
+                        <p style="
+                            margin:5px 0;
+                            color:#6b7280;
+                        ">
                             {{ $education->field }}
                         </p>
+
                     @endif
 
                 </div>

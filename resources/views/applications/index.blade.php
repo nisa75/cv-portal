@@ -35,22 +35,19 @@
         <h1>📋 Başvurularım</h1>
 
         <p style="color:#6b7280;">
-            Gönderdiğin iş başvurularını ve güncel durumlarını takip et.
+            Gönderdiğin iş başvurılarını ve durumlarını takip et.
         </p>
 
     </div>
-
 
     @if ($applications->isEmpty())
 
         <div class="card">
 
-            <h2>
-                Henüz başvurun yok.
-            </h2>
+            <h2>Henüz başvurun yok.</h2>
 
             <p style="color:#6b7280;">
-                İş ilanlarını inceleyip sana uygun pozisyonlara başvurabilirsin.
+                Sana uygun iş ilanlarını inceleyip başvurabilirsin.
             </p>
 
             <a
@@ -112,7 +109,6 @@
 
                         </div>
 
-
                         <span class="badge {{ $statusClass }}">
                             {{ $statusLabel }}
                         </span>
@@ -136,11 +132,10 @@
 
                         </div>
 
-
                         <div>
 
                             <p style="color:#6b7280;">
-                                <strong>Çalışma Şekli:</strong>
+                                <strong>Çalışma:</strong>
                                 {{ $application->job->employment_type }}
                             </p>
 
@@ -165,7 +160,14 @@
                             href="/candidate/jobs/{{ $application->job->id }}"
                             class="btn"
                         >
-                            İlanı Gör
+                            👁️ İlanı Gör
+                        </a>
+
+                        <a
+                            href="/applications/{{ $application->id }}/message"
+                            class="btn btn-secondary"
+                        >
+                            💬 Mesajlaş
                         </a>
 
                     </div>

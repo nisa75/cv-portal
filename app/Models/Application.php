@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use App\Models\Conversation;
+use App\Models\Interview;
 class Application extends Model
 {
     protected $fillable = [
@@ -29,4 +30,13 @@ class Application extends Model
     {
         return $this->belongsTo(Cv::class);
     }
+    public function conversation()
+{
+    return $this->hasOne(Conversation::class);
+}
+public function interview()
+{
+    return $this->hasOne(Interview::class);
+}
+
 }
