@@ -11,7 +11,7 @@
     <title>
         @yield('title', 'CV Portal')
     </title>
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css'])
 </head>
 

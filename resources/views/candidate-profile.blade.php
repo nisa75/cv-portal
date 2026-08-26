@@ -39,12 +39,16 @@
     @endif
 
 
+    <div id="ai-error" class="alert alert-error" style="display:none;"></div>
+
+
     <div class="card">
 
         <form
             action="/candidate/profile"
             method="POST"
             enctype="multipart/form-data"
+            id="profile-form"
         >
 
             @csrf
@@ -136,16 +140,48 @@
 
             <div class="form-group">
 
-                <label for="about">
-                    Hakkımda
-                </label>
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    flex-wrap:wrap;
+                    margin-bottom:8px;
+                ">
+
+                    <label
+                        for="about"
+                        style="margin:0;"
+                    >
+                        Hakkımda
+                    </label>
+
+                    <button
+                        type="button"
+                        id="ai-about-button"
+                        class="btn"
+                        style="min-height:38px;"
+                    >
+                        ✨ AI ile Hakkımda Oluştur
+                    </button>
+
+                </div>
 
                 <textarea
                     id="about"
                     name="about"
-                    rows="8"
+                    rows="9"
                     placeholder="Kendin, deneyimlerin ve kariyer hedeflerin hakkında kısa bir bilgi..."
                 >{{ old('about', $profile?->about) }}</textarea>
+
+                <p style="
+                    color:#9ca3af;
+                    font-size:13px;
+                    margin-top:7px;
+                ">
+                    AI mevcut profil bilgilerini kullanarak profesyonel bir metin oluşturur.
+                    Oluşan metni kaydetmeden önce düzenleyebilirsin.
+                </p>
 
             </div>
 
@@ -269,5 +305,131 @@
     </div>
 
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const button = document.getElementById('ai-about-button');
+    const about = document.getElementById('about');
+    const errorBox = document.getElementById('ai-error');
+
+    button.addEventListener('click', async function () {
+
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+
+        button.disabled = true;
+        button.innerHTML = '⏳ AI yazıyor...';
+
+        const formData = new FormData();
+
+        formData.append(
+            'name',
+            @json(auth()->user()->name)
+        );
+
+        formData.append(
+            'skills',
+            @json(
+                auth()->user()
+                    ->skills
+                    ->pluck('name')
+                    ->implode(', ')
+            )
+        );
+
+        formData.append(
+            'experience',
+            @json(
+                auth()->user()
+                    ->experiences
+                    ->map(function ($experience) {
+                        return
+                            $experience->position
+                            . ' - '
+                            . $experience->company
+                            . ': '
+                            . ($experience->description ?? '');
+                    })
+                    ->implode("\n")
+            )
+        );
+
+        formData.append(
+            'education',
+            @json(
+                auth()->user()
+                    ->educations
+                    ->map(function ($education) {
+                        return
+                            ($education->school ?? '')
+                            . ' - '
+                            . ($education->field ?? '')
+                            . ' '
+                            . ($education->degree ?? '');
+                    })
+                    ->implode("\n")
+            )
+        );
+
+        formData.append(
+            'current_about',
+            about.value
+        );
+
+        try {
+
+            const response = await fetch(
+                '/candidate/ai/generate-about',
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content'),
+
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    'AI metni oluştururken bir hata oluştu.'
+                );
+
+            }
+
+            about.value = data.about;
+
+            about.focus();
+
+        } catch (error) {
+
+            errorBox.textContent =
+                error.message ||
+                'AI isteği başarısız oldu.';
+
+            errorBox.style.display = 'block';
+
+        } finally {
+
+            button.disabled = false;
+            button.innerHTML =
+                '✨ AI ile Hakkımda Oluştur';
+
+        }
+
+    });
+
+});
+</script>
 
 @endsection

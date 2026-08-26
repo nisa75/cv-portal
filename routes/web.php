@@ -18,7 +18,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\InterviewController;
-
+use App\Http\Controllers\AiController;
 // ==================================================
 // ANA SAYFA
 // ==================================================
@@ -75,7 +75,8 @@ Route::get('/candidate/profile', [CandidateProfileController::class, 'show'])
 Route::post('/candidate/profile', [CandidateProfileController::class, 'store'])
     ->middleware(['auth', 'role:candidate']);
 
-
+Route::post('/candidate/ai/generate-about', [AiController::class, 'generateAbout'])
+    ->middleware(['auth', 'role:candidate']);
 // ==================================================
 // EDUCATION
 // ==================================================
