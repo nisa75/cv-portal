@@ -20,11 +20,25 @@ class CvController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+
+        if (!$user->isPremium() && $user->cvs()->count() >= 3) {
+            return redirect('/candidate/cvs')
+                ->with('error', 'Ücretsiz planda en fazla 3 CV oluşturabilirsiniz. Daha fazla CV için Premium üyeliğe geçebilirsiniz.');
+        }
+
         return view('cvs.create');
     }
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        if (!$user->isPremium() && $user->cvs()->count() >= 3) {
+            return redirect('/candidate/cvs')
+                ->with('error', 'Ücretsiz planda en fazla 3 CV oluşturabilirsiniz. Daha fazla CV için Premium üyeliğe geçebilirsiniz.');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'template' => 'required|in:modern,classic,minimal',
@@ -33,7 +47,7 @@ class CvController extends Controller
         $validated['public_token'] = Str::random(40);
         $validated['is_public'] = false;
 
-        auth()->user()->cvs()->create($validated);
+        $user->cvs()->create($validated);
 
         return redirect('/candidate/cvs')
             ->with('success', 'CV başarıyla oluşturuldu.');

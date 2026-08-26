@@ -85,6 +85,28 @@ class AdminController extends Controller
             ->with('success', 'Kullanıcı başarıyla silindi.');
     }
 
+    public function togglePremium(User $user)
+    {
+        abort_unless(
+            $user->role === 'candidate',
+            403
+        );
+
+        $user->update([
+            'plan' => $user->plan === 'premium'
+                ? 'free'
+                : 'premium',
+        ]);
+
+        return redirect('/admin/users')
+            ->with(
+                'success',
+                $user->plan === 'premium'
+                    ? 'Kullanıcı Premium yapıldı.'
+                    : 'Kullanıcı Free plana geçirildi.'
+            );
+    }
+
     public function toggleJobStatus(Job $job)
     {
         if ($job->status === 'published') {

@@ -4,41 +4,204 @@
 
 @section('content')
 
+@php
+    $user = auth()->user();
+
+    $cvCount = $cvs->count();
+
+    $isPremium = $user->isPremium();
+
+    $freeLimit = 3;
+
+    $remainingCv = max($freeLimit - $cvCount, 0);
+@endphp
+
 <div>
 
     <div style="margin-bottom:30px;">
 
-        <h1>📄 CV'lerim</h1>
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:20px;
+            flex-wrap:wrap;
+        ">
 
-        <p style="color:#6b7280;">
-            CV'lerini oluştur, düzenle, indir ve paylaş.
-        </p>
+            <div>
 
-        <a
-            href="/candidate/cvs/create"
-            class="btn"
-        >
-            + Yeni CV Oluştur
-        </a>
+                <h1>📄 CV'lerim</h1>
+
+                <p style="color:#6b7280;">
+                    CV'lerini oluştur, düzenle, indir ve paylaş.
+                </p>
+
+            </div>
+
+
+            @if ($isPremium)
+
+                <span class="badge badge-green">
+                    ⭐ Premium Üye
+                </span>
+
+            @else
+
+                <span class="badge badge-blue">
+                    🆓 Ücretsiz Plan
+                </span>
+
+            @endif
+
+        </div>
 
     </div>
 
-    @if ($cvs->isEmpty())
 
-        <div class="card">
+    <!-- PLAN DURUMU -->
 
-            <h2>Henüz CV oluşturmadın.</h2>
+    <div class="card" style="margin-bottom:25px;">
 
-            <p style="color:#6b7280;">
-                İlk CV'ni oluşturarak başlayabilirsin.
-            </p>
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            flex-wrap:wrap;
+        ">
+
+            <div>
+
+                @if ($isPremium)
+
+                    <h2 style="margin-top:0;">
+                        ⭐ Premium Plan
+                    </h2>
+
+                    <p style="color:#6b7280;">
+                        Sınırsız CV oluşturabilirsin.
+                    </p>
+
+                @else
+
+                    <h2 style="margin-top:0;">
+                        🆓 Ücretsiz Plan
+                    </h2>
+
+                    <p style="color:#6b7280;">
+
+                        {{ $cvCount }} / {{ $freeLimit }} CV kullandın.
+
+                        @if ($remainingCv > 0)
+                            {{ $remainingCv }} CV oluşturma hakkın kaldı.
+                        @else
+                            Ücretsiz CV limitine ulaştın.
+                        @endif
+
+                    </p>
+
+                @endif
+
+            </div>
+
+
+            @if (!$isPremium)
+
+                <div style="
+                    padding:12px 16px;
+                    border-radius:10px;
+                    background:#f9fafb;
+                    color:#6b7280;
+                ">
+                    ✨ Daha fazla CV için Premium
+                </div>
+
+            @endif
+
+        </div>
+
+    </div>
+
+
+    @if (session('success'))
+
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+
+    @endif
+
+
+    @if (session('error'))
+
+        <div class="alert alert-error">
+            {{ session('error') }}
+        </div>
+
+    @endif
+
+
+    <!-- YENİ CV -->
+
+    @if ($isPremium || $cvCount < $freeLimit)
+
+        <div style="margin-bottom:25px;">
 
             <a
                 href="/candidate/cvs/create"
                 class="btn"
             >
-                CV Oluştur
+                + Yeni CV Oluştur
             </a>
+
+        </div>
+
+    @else
+
+        <div
+            class="card"
+            style="
+                margin-bottom:25px;
+                border:1px solid #f59e0b;
+            "
+        >
+
+            <h2 style="margin-top:0;">
+                🔒 Ücretsiz CV limitine ulaştın
+            </h2>
+
+            <p style="color:#6b7280;">
+                Ücretsiz planda en fazla {{ $freeLimit }} CV oluşturabilirsin.
+                Daha fazla CV oluşturmak için Premium üyeliğe geçebilirsin.
+            </p>
+
+        </div>
+
+    @endif
+
+
+    @if ($cvs->isEmpty())
+
+        <div class="card">
+
+            <h2>
+                Henüz CV oluşturmadın.
+            </h2>
+
+            <p style="color:#6b7280;">
+                İlk CV'ni oluşturarak başlayabilirsin.
+            </p>
+
+            @if ($isPremium || $cvCount < $freeLimit)
+
+                <a
+                    href="/candidate/cvs/create"
+                    class="btn"
+                >
+                    📄 İlk CV'yi Oluştur
+                </a>
+
+            @endif
 
         </div>
 
@@ -71,13 +234,17 @@
                         </div>
 
                         @if ($cv->is_public)
+
                             <span class="badge badge-green">
                                 🌐 Public
                             </span>
+
                         @else
+
                             <span class="badge">
                                 🔒 Gizli
                             </span>
+
                         @endif
 
                     </div>
@@ -131,12 +298,14 @@
                                 margin-bottom:0;
                                 word-break:break-all;
                             ">
+
                                 <a
                                     href="{{ url('/cv/' . $cv->public_token) }}"
                                     target="_blank"
                                 >
                                     {{ url('/cv/' . $cv->public_token) }}
                                 </a>
+
                             </p>
 
                         </div>
@@ -144,12 +313,17 @@
                     @endif
 
 
-                    <div style="margin-top:20px;">
+                    <div style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                        margin-top:20px;
+                    ">
 
                         <form
                             action="/candidate/cvs/{{ $cv->id }}/visibility"
                             method="POST"
-                            style="display:inline-block;"
+                            style="margin:0;"
                         >
 
                             @csrf
@@ -181,7 +355,7 @@
                         <form
                             action="/candidate/cvs/{{ $cv->id }}"
                             method="POST"
-                            style="display:inline-block; margin-left:8px;"
+                            style="margin:0;"
                         >
 
                             @csrf

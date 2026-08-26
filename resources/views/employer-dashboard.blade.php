@@ -23,21 +23,18 @@
         ->count();
 @endphp
 
-
 <div>
 
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom:30px;">
 
-        <h1>
-            İşveren Paneli 🏢
-        </h1>
+        <h1>🏢 İşveren Paneli</h1>
 
-        <p style="color:#6b7280; margin-top:5px;">
+        <p style="color:#6b7280;">
             Hoş geldin, <strong>{{ auth()->user()->name }}</strong>!
         </p>
 
         <p style="color:#6b7280;">
-            Firma bilgilerini, iş ilanlarını ve başvuruları buradan yönetebilirsin.
+            Firma, ilan, aday ve başvurularını buradan yönetebilirsin.
         </p>
 
     </div>
@@ -47,41 +44,65 @@
 
     <div class="grid grid-3">
 
-        <div class="stat-card">
+        <div class="card">
 
-            <div class="stat-label">
+            <div style="font-size:30px;">
+                💼
+            </div>
+
+            <h3>
                 İlanlarım
-            </div>
+            </h3>
 
-            <div class="stat-number">
+            <p style="
+                font-size:32px;
+                font-weight:700;
+                margin:5px 0;
+            ">
                 {{ $jobCount }}
-            </div>
+            </p>
 
         </div>
 
 
-        <div class="stat-card">
+        <div class="card">
 
-            <div class="stat-label">
-                Toplam Başvuru
+            <div style="font-size:30px;">
+                📋
             </div>
 
-            <div class="stat-number">
+            <h3>
+                Başvurular
+            </h3>
+
+            <p style="
+                font-size:32px;
+                font-weight:700;
+                margin:5px 0;
+            ">
                 {{ $applicationCount }}
-            </div>
+            </p>
 
         </div>
 
 
-        <div class="stat-card">
+        <div class="card">
 
-            <div class="stat-label">
+            <div style="font-size:30px;">
+                🔔
+            </div>
+
+            <h3>
                 Okunmamış Bildirim
-            </div>
+            </h3>
 
-            <div class="stat-number">
+            <p style="
+                font-size:32px;
+                font-weight:700;
+                margin:5px 0;
+            ">
                 {{ $unreadNotificationCount }}
-            </div>
+            </p>
 
         </div>
 
@@ -96,21 +117,21 @@
             Hızlı Erişim
         </h2>
 
-        <div class="grid grid-2" style="margin-top:20px;">
-
+        <div class="grid grid-3" style="margin-top:20px;">
 
             <a
                 href="/employer/company"
                 class="card"
-                style="text-decoration:none; color:inherit;"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                "
             >
 
-                <h3>
-                    🏢 Firma Profilim
-                </h3>
+                <h3>🏢 Firma Profilim</h3>
 
                 <p style="color:#6b7280;">
-                    Firma bilgilerini görüntüle ve güncelle.
+                    Firma bilgilerini ve logonu yönet.
                 </p>
 
             </a>
@@ -119,21 +140,16 @@
             <a
                 href="/employer/jobs"
                 class="card"
-                style="text-decoration:none; color:inherit;"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                "
             >
 
-                <h3>
-                    💼 İlanlarım
-                </h3>
+                <h3>💼 İlanlarım</h3>
 
                 <p style="color:#6b7280;">
-                    İş ilanlarını oluştur, düzenle ve yönet.
-
-                    @if ($jobCount > 0)
-                        <strong>
-                            ({{ $jobCount }})
-                        </strong>
-                    @endif
+                    İş ilanlarını oluştur ve yönet.
                 </p>
 
             </a>
@@ -142,21 +158,67 @@
             <a
                 href="/employer/applications"
                 class="card"
-                style="text-decoration:none; color:inherit;"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                "
             >
 
+                <h3>📋 Gelen Başvurular</h3>
+
+                <p style="color:#6b7280;">
+                    Aday başvurularını incele.
+                </p>
+
+            </a>
+
+
+            <!-- YENİ: ADAYLARI KEŞFET -->
+
+            <a
+                href="/employer/candidates"
+                class="card"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                    border:1px solid #dbeafe;
+                "
+            >
+
+                <div style="font-size:32px;">
+                    👥
+                </div>
+
                 <h3>
-                    📋 Başvurular
+                    Adayları Keşfet
                 </h3>
 
                 <p style="color:#6b7280;">
-                    İş ilanlarına gelen aday başvurularını incele.
+                    Sistemdeki adayları incele.
+                    Öne çıkarılmış Premium profilleri
+                    keşfet.
+                </p>
 
-                    @if ($applicationCount > 0)
-                        <strong>
-                            ({{ $applicationCount }})
-                        </strong>
-                    @endif
+                <span class="btn" style="margin-top:10px;">
+                    👥 Adayları Gör
+                </span>
+
+            </a>
+
+
+            <a
+                href="/messages"
+                class="card"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                "
+            >
+
+                <h3>💬 Mesajlar</h3>
+
+                <p style="color:#6b7280;">
+                    Adaylarla iletişim kur.
                 </p>
 
             </a>
@@ -165,21 +227,16 @@
             <a
                 href="/employer/notifications"
                 class="card"
-                style="text-decoration:none; color:inherit;"
+                style="
+                    text-decoration:none;
+                    color:inherit;
+                "
             >
 
-                <h3>
-                    🔔 Bildirimler
-                </h3>
+                <h3>🔔 Bildirimler</h3>
 
                 <p style="color:#6b7280;">
-                    Yeni başvurular ve sistem bildirimlerini görüntüle.
-
-                    @if ($unreadNotificationCount > 0)
-                        <strong>
-                            ({{ $unreadNotificationCount }} yeni)
-                        </strong>
-                    @endif
+                    Sistem bildirimlerini görüntüle.
                 </p>
 
             </a>

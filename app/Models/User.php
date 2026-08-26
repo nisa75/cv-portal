@@ -19,20 +19,26 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-    ];
+         'plan',
+         'is_featured',
+'featured_until',
+];
+
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+   protected function casts(): array
+{
+    return [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_featured' => 'boolean',
+        'featured_until' => 'datetime',
+    ];
+}
 
     public function candidateProfile(): HasOne
     {
@@ -85,5 +91,36 @@ public function candidateConversations()
 public function employerConversations()
 {
     return $this->hasMany(Conversation::class, 'employer_id');
+}
+public function isPremium(): bool
+{
+    return $this->plan === 'premium';
+}
+
+public function isFree(): bool
+{
+    return $this->plan === 'free';
+}
+public function isFeatured(): bool
+{
+    return $this->is_featured
+        && $this->featured_until
+        && $this->featured_until->isFuture();
+}
+
+public function featureForDays(int $days = 7): void
+{
+    $this->update([
+        'is_featured' => true,
+        'featured_until' => now()->addDays($days),
+    ]);
+}
+
+public function removeFeatured(): void
+{
+    $this->update([
+        'is_featured' => false,
+        'featured_until' => null,
+    ]);
 }
 }

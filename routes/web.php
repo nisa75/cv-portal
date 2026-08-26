@@ -19,6 +19,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\EmployerCandidateController;
+use App\Http\Controllers\FeaturedProfileController;
 // ==================================================
 // ANA SAYFA
 // ==================================================
@@ -78,6 +80,13 @@ Route::post('/candidate/profile', [CandidateProfileController::class, 'store'])
 Route::post('/candidate/ai/generate-about', [AiController::class, 'generateAbout'])
     ->middleware(['auth', 'role:candidate']);
     Route::post('/candidate/ai/improve-experience', [AiController::class, 'improveExperience'])
+    ->middleware(['auth', 'role:candidate']);
+    Route::put('/admin/users/{user}/premium', [AdminController::class, 'togglePremium'])
+    ->middleware(['auth', 'role:admin']);
+    Route::post('/candidate/profile/feature', [FeaturedProfileController::class, 'feature'])
+    ->middleware(['auth', 'role:candidate']);
+
+Route::delete('/candidate/profile/feature', [FeaturedProfileController::class, 'remove'])
     ->middleware(['auth', 'role:candidate']);
 // ==================================================
 // EDUCATION
@@ -243,7 +252,8 @@ Route::get('/employer/company', [CompanyController::class, 'show'])
 
 Route::post('/employer/company', [CompanyController::class, 'store'])
     ->middleware(['auth', 'role:employer']);
-
+Route::get('/employer/candidates', [EmployerCandidateController::class, 'index'])
+    ->middleware(['auth', 'role:employer']);
 
 // ==================================================
 // EMPLOYER JOBS

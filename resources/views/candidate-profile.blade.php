@@ -39,6 +39,125 @@
     @endif
 
 
+    @if (session('featured_warning'))
+
+        <div class="alert alert-error">
+            {{ session('featured_warning') }}
+        </div>
+
+    @endif
+
+
+    <!-- PREMIUM / ÖNE ÇIKARMA -->
+
+    @if (auth()->user()->plan === 'premium')
+
+        <div
+            class="card"
+            style="
+                margin-bottom:20px;
+                border:1px solid #f59e0b;
+                background:linear-gradient(135deg, #fffbeb, #ffffff);
+            "
+        >
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                gap:20px;
+                flex-wrap:wrap;
+            ">
+
+                <div>
+
+                    <span class="badge badge-green">
+                        ⭐ Premium
+                    </span>
+
+                    <h2 style="margin-bottom:8px;">
+                        🚀 Profilini Öne Çıkar
+                    </h2>
+
+                    <p style="color:#6b7280; margin:0;">
+                        Profilin 7 gün boyunca işverenlerin aday listesinde
+                        öne çıkarılır.
+                    </p>
+
+                    @if (auth()->user()->isFeatured())
+
+                        <p style="
+                            margin-top:12px;
+                            color:#92400e;
+                        ">
+                            🚀 Profilin şu anda öne çıkarılmış durumda.
+
+                            @if (auth()->user()->featured_until)
+                                <br>
+                                <strong>
+                                    Bitiş:
+                                    {{ auth()->user()->featured_until->format('d.m.Y H:i') }}
+                                </strong>
+                            @endif
+                        </p>
+
+                    @endif
+
+                </div>
+
+
+                <div>
+
+                    @if (auth()->user()->isFeatured())
+
+                        <form
+                            action="/candidate/profile/feature"
+                            method="POST"
+                        >
+
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                class="btn btn-secondary"
+                            >
+                                ⏹️ Öne Çıkarmayı Kaldır
+                            </button>
+
+                        </form>
+
+                    @else
+
+                        <form
+                            action="/candidate/profile/feature"
+                            method="POST"
+                        >
+
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="btn"
+                            >
+                                🚀 Profilimi Öne Çıkar
+                            </button>
+
+                        </form>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
+
+
+    <!-- PROFİL FORMU -->
+
     <div id="ai-error" class="alert alert-error" style="display:none;"></div>
 
 
@@ -136,7 +255,7 @@
             </div>
 
 
-            <!-- HAKKIMDA -->
+            <!-- HAKKIMDA + AI -->
 
             <div class="form-group">
 
@@ -179,8 +298,8 @@
                     font-size:13px;
                     margin-top:7px;
                 ">
-                    AI mevcut profil bilgilerini kullanarak profesyonel bir metin oluşturur.
-                    Oluşan metni kaydetmeden önce düzenleyebilirsin.
+                    AI mevcut profil bilgilerini kullanarak profesyonel
+                    bir metin oluşturur.
                 </p>
 
             </div>
@@ -242,8 +361,6 @@
 
             </div>
 
-
-            <!-- KAYDET -->
 
             <button
                 type="submit"
@@ -313,6 +430,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const button = document.getElementById('ai-about-button');
     const about = document.getElementById('about');
     const errorBox = document.getElementById('ai-error');
+
+    if (!button) {
+        return;
+    }
 
     button.addEventListener('click', async function () {
 
@@ -384,6 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 '/candidate/ai/generate-about',
                 {
                     method: 'POST',
+
                     headers: {
                         'X-CSRF-TOKEN':
                             document
@@ -392,6 +514,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         'Accept': 'application/json'
                     },
+
                     body: formData
                 }
             );
@@ -408,7 +531,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             about.value = data.about;
-
             about.focus();
 
         } catch (error) {
@@ -422,6 +544,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } finally {
 
             button.disabled = false;
+
             button.innerHTML =
                 '✨ AI ile Hakkımda Oluştur';
 
