@@ -54,4 +54,45 @@ PROMPT;
             'about' => trim($result->text()),
         ]);
     }
+
+    public function improveExperience(Request $request)
+    {
+        $validated = $request->validate([
+            'company' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'description' => 'required|string|max:5000',
+        ]);
+
+        $prompt = <<<PROMPT
+Bir CV'deki iş deneyimi açıklamasını profesyonel ve etkili hale getir.
+
+Şirket:
+{$validated['company']}
+
+Pozisyon:
+{$validated['position']}
+
+Mevcut açıklama:
+{$validated['description']}
+
+Kurallar:
+- Türkçe yaz.
+- 50-120 kelime arasında olsun.
+- Profesyonel ama doğal bir dil kullan.
+- CV'ye uygun olsun.
+- Adayın verdiği bilgiler dışında yeni bilgi uydurma.
+- Yapılan işleri, kullanılan teknolojileri ve katkıları mümkün olduğunca net ifade et.
+- Gereksiz süslü ifadeler kullanma.
+- Sadece iyileştirilmiş açıklamayı döndür.
+PROMPT;
+
+        $result = Gemini::generativeModel(
+            model: 'gemini-3.6-flash'
+        )->generateContent($prompt);
+
+        return response()->json([
+            'success' => true,
+            'description' => trim($result->text()),
+        ]);
+    }
 }

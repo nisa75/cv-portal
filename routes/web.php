@@ -77,6 +77,8 @@ Route::post('/candidate/profile', [CandidateProfileController::class, 'store'])
 
 Route::post('/candidate/ai/generate-about', [AiController::class, 'generateAbout'])
     ->middleware(['auth', 'role:candidate']);
+    Route::post('/candidate/ai/improve-experience', [AiController::class, 'improveExperience'])
+    ->middleware(['auth', 'role:candidate']);
 // ==================================================
 // EDUCATION
 // ==================================================

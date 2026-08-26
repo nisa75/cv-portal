@@ -38,6 +38,9 @@
         @endif
 
 
+        <div id="ai-experience-error" class="alert alert-error" style="display:none;"></div>
+
+
         <form
             action="/candidate/experiences/{{ $experience->id }}"
             method="POST"
@@ -141,17 +144,52 @@
             </div>
 
 
+            <!-- AI AÇIKLAMA -->
+
             <div class="form-group">
 
-                <label for="description">
-                    Açıklama
-                </label>
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    flex-wrap:wrap;
+                    margin-bottom:8px;
+                ">
+
+                    <label
+                        for="description"
+                        style="margin:0;"
+                    >
+                        Açıklama
+                    </label>
+
+                    <button
+                        type="button"
+                        id="ai-experience-button"
+                        class="btn"
+                        style="min-height:38px;"
+                    >
+                        ✨ AI ile Açıklamayı Geliştir
+                    </button>
+
+                </div>
+
 
                 <textarea
                     id="description"
                     name="description"
-                    rows="7"
+                    rows="8"
                 >{{ old('description', $experience->description) }}</textarea>
+
+                <p style="
+                    color:#9ca3af;
+                    font-size:13px;
+                    margin-top:7px;
+                ">
+                    AI mevcut açıklamanı daha profesyonel bir CV metnine dönüştürür.
+                    Metni kaydetmeden önce düzenleyebilirsin.
+                </p>
 
             </div>
 
@@ -180,5 +218,99 @@
     </div>
 
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const button = document.getElementById('ai-experience-button');
+    const company = document.getElementById('company');
+    const position = document.getElementById('position');
+    const description = document.getElementById('description');
+    const errorBox = document.getElementById('ai-experience-error');
+
+    button.addEventListener('click', async function () {
+
+        errorBox.style.display = 'none';
+        errorBox.textContent = '';
+
+        if (!company.value.trim()) {
+            errorBox.textContent = 'Önce şirket adını yaz.';
+            errorBox.style.display = 'block';
+            company.focus();
+            return;
+        }
+
+        if (!position.value.trim()) {
+            errorBox.textContent = 'Önce pozisyonu yaz.';
+            errorBox.style.display = 'block';
+            position.focus();
+            return;
+        }
+
+        if (!description.value.trim()) {
+            errorBox.textContent = 'Önce deneyim açıklamasını yaz.';
+            errorBox.style.display = 'block';
+            description.focus();
+            return;
+        }
+
+        button.disabled = true;
+        button.innerHTML = '⏳ AI yazıyor...';
+
+        try {
+
+            const response = await fetch(
+                '/candidate/ai/improve-experience',
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content'),
+
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        company: company.value,
+                        position: position.value,
+                        description: description.value
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                    'AI açıklamayı geliştirirken bir hata oluştu.'
+                );
+            }
+
+            description.value = data.description;
+            description.focus();
+
+        } catch (error) {
+
+            errorBox.textContent =
+                error.message ||
+                'AI isteği başarısız oldu.';
+
+            errorBox.style.display = 'block';
+
+        } finally {
+
+            button.disabled = false;
+            button.innerHTML =
+                '✨ AI ile Açıklamayı Geliştir';
+
+        }
+
+    });
+
+});
+</script>
 
 @endsection
